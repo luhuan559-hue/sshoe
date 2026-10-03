@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>鞋店 · 新款管理</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f3f5f9;
+      min-height: 100vh;
+      padding: 0.8rem;
+      padding-bottom: 3rem;
+    }
+    .app-container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      padding: 1.2rem;
+      position: relative;
+    }
+
+    /* ========== 顶部栏 ========== */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .brand h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #1e2f3a;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .brand .badge {
+      display: none;
+      background: #d8f3dc;
+      color: #1e4d38;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .search-section {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #f8fafc;
+      padding: 0.3rem 0.3rem 0.3rem 1rem;
+      border-radius: 60px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+      transition: box-shadow 0.2s;
+      flex: 1 1 200px;
+      min-width: 0;
+    }
+    .search-section:focus-within {
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 0 2px #2d6a4f;
+      background: white;
+    }
+    .search-section input {
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+      padding: 0.6rem 0.3rem 0.6rem 0;
+      width: 100%;
+      min-width: 0;
+      background: transparent;
+      color: #1a2e35;
+    }
+    .search-section input::placeholder { color: #9aa9b2; }
+    .search-section button {
+      background: #2d6a4f;
+      border: none;
+      border-radius: 40px;
+      padding: 0.55rem 1rem;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .search-section button:active { background: #1e4d38; }
+
+    /* ========== 上传表单 ========== */
+    .upload-card {
+      background: #f9fbfd;
+      border-radius: 1.3rem;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #e9edf2;
+    }
+    .upload-card h2 {
+      font-size: 1.05rem;
+      margin-bottom: 1rem;
+      color: #1e2f3a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+    }
+    .upload-card h2 span {
+      background: #2d6a4f;
+      color: white;
+      font-size: 0.8rem;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+    .form-group { min-width: 0; }
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-weight: 700;
+      color: #5c6f7a;
+      margin-bottom: 0.35rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.9rem;
+      border: 1px solid #d0dae2;
+      background: white;
+      font-size: 0.95rem;
+      -webkit-appearance: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #2d6a4f;
+      box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
+    }
+
+    /* 图片上传区 */
+    .image-upload-group {
+      grid-column: 1 / -1;
+      margin-top: 0.3rem;
+    }
+    .image-upload-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .image-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 1rem;
+      background: #f0f4f9;
+      border: 2px dashed #cbd5e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+    .image-preview.has-image {
+      border-style: solid;
+      border-color: #2d6a4f;
+    }
+    .image-preview:active { transform: scale(0.98); }
+    .image-preview img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover;
+      display: block;
+    }
+    .image-preview .placeholder-icon { font-size: 2rem; color: #a0b3c4; }
+    .image-preview.has-image::after {
+      content: '🔍';
+      position: absolute;
+      bottom: 3px;
+      right: 3px;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      font-size: 0.65rem;
+      padding: 1px 5px;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .image-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+      min-width: 160px;
+    }
+    .file-input-label {
+      background: white;
+      border: 1px solid #d0dae2;
+      padding: 0.7rem 1.2rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #3f5564;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: border 0.2s, background 0.2s;
+      text-align: center;
+    }
+    .file-input-label:active { background: #f0f9f4; border-color: #2d6a4f; }
+    .file-input-label input[type="file"] { display: none; }
+
+    .btn-reselect {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #c2410c;
+      padding: 0.55rem 1rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      transition: background 0.15s;
+    }
+    .btn-reselect:active { background: #ffedd5; }
+    .btn-reselect.visible { display: inline-flex; }
+
+    .image-filename {
+      font-size: 0.75rem;
+      color: #2d6a4f;
+      font-weight: 600;
+      word-break: break-all;
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+      background: #edf7f2;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+    }
+    .image-filename.visible { display: flex; }
+
+    .btn-add {
+      background: #2d6a4f;
+      border: none;
+      color: white;
+      padding: 0.85rem 1.5rem;
+      border-radius: 1rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      box-shadow: 0 6px 14px rgba(45,106,79,0.2);
+      flex: 1 1 100%;
+      margin-top: 0.3rem;
+    }
+    .btn-add:active { background: #1e4d38; }
+
+    .message-bar {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      padding: 0.55rem 0.9rem;
+      border-radius: 2rem;
+      background: #edf7f2;
+      color: #1e4d38;
+      display: inline-block;
+    }
+
+    /* ========== 列表 ========== */
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.9rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .list-header h3 { font-size: 1.05rem; font-weight: 700; color: #1e2f3a; }
+    .count-badge {
+      background: #e2e8f0;
+      color: #2d3f4b;
+      border-radius: 30px;
+      padding: 0.25rem 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .shoes-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .shoe-item {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      border: 1px solid #e9edf2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      animation: fadeIn 0.2s ease;
+      position: relative;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .shoe-thumb {
+      width: 65px;
+      height: 65px;
+      border-radius: 0.9rem;
+      overflow: hidden;
+      background: #f0f4f9;
+      flex-shrink: 0;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .shoe-thumb:active { transform: scale(0.95); }
+    .shoe-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .shoe-thumb .no-image { font-size: 1.6rem; color: #b0c0ce; }
+
+    .shoe-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .shoe-top-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .shoe-code {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #1e2f3a;
+      background: #f0f4f9;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      letter-spacing: 0.3px;
+    }
+    .shoe-color {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #3f5564;
+      font-weight: 500;
+      font-size: 0.85rem;
+    }
+    .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+    .shoe-model {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: #eef2ff;
+      color: #4338ca;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      letter-spacing: 0.2px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .shoe-model .model-icon { font-size: 0.75rem; }
+    .price-group {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+    }
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+    }
+    .price-label {
+      color: #7b8b99;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .price-value { font-weight: 800; color: #2d6a4f; font-size: 0.95rem; }
+
+    /* ========== 删除按钮（重点优化：醒目、好点） ========== */
+    .btn-delete {
+      background: #fee2e2;
+      border: 1.5px solid #fca5a5;
+      color: #b91c1c;
+      padding: 0.55rem 0.9rem;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      white-space: nowrap;
+      min-height: 40px;
+    }
+    .btn-delete svg { flex-shrink: 0; }
+    .btn-delete:active {
+      background: #fecaca;
+      border-color: #ef4444;
+      transform: scale(0.95);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: #f9fbfd;
+      border-radius: 1.5rem;
+      color: #8b9aa8;
+      font-size: 0.9rem;
+      border: 1px dashed #d0dae2;
+    }
+    .highlight {
+      background: #fef9c3;
+      padding: 0.05rem 0.15rem;
+      border-radius: 5px;
+      font-weight: 800;
+    }
+
+    /* ========== 图片放大弹层 ========== */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+      cursor: zoom-out;
+      animation: lbFadeIn 0.2s ease;
+    }
+    .lightbox.visible { display: flex; }
+    @keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .lightbox-close:active { background: rgba(255,255,255,0.3); }
+
+    /* ========== 删除确认弹窗（手机上更好看） ========== */
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 1.5rem;
+      animation: lbFadeIn 0.15s ease;
+    }
+    .confirm-overlay.visible { display: flex; }
+    .confirm-box {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.3rem 1.2rem;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      animation: popIn 0.2s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .confirm-box .warn-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .confirm-box h4 {
+      font-size: 1.1rem;
+      color: #1e2f3a;
+      margin-bottom: 0.4rem;
+      font-weight: 700;
+    }
+    .confirm-box p {
+      font-size: 0.88rem;
+      color: #5c6f7a;
+      margin-bottom: 1.3rem;
+      line-height: 1.4;
+    }
+    .confirm-box p strong {
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 0.1rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+    .confirm-actions {
+      display: flex;
+      gap: 0.7rem;
+    }
+    .confirm-actions button {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 1rem;
+      border: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-cancel {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .btn-cancel:active { background: #e2e8f0; }
+    .btn-confirm-delete {
+      background: #dc2626;
+      color: white;
+      box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+    }
+    .btn-confirm-delete:active { background: #b91c1c; transform: scale(0.98); }
+
+    /* ========== 手机适配 ========== */
+    @media (max-width: 640px) {
+      body { padding: 0.5rem; padding-bottom: 2rem; }
+      .app-container { padding: 0.9rem; border-radius: 1.2rem; }
+      .brand h1 { font-size: 1.1rem; }
+      .search-section { flex: 1 1 100%; }
+      .search-section input { font-size: 0.9rem; }
+      .search-section button { padding: 0.5rem 0.9rem; font-size: 0.8rem; }
+
+      .form-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+      .form-group label { font-size: 0.68rem; }
+      .form-group input { padding: 0.65rem 0.75rem; font-size: 0.9rem; }
+
+      .image-upload-wrapper { gap: 0.8rem; }
+      .image-preview { width: 110px; height: 110px; }
+      .image-actions { min-width: 140px; }
+
+      .shoe-item { padding: 0.8rem 0.75rem; gap: 0.7rem; }
+      .shoe-thumb { width: 55px; height: 55px; }
+      .shoe-code { font-size: 0.85rem; padding: 0.15rem 0.65rem; }
+      .price-value { font-size: 0.95rem; }
+
+      /* 手机上删除按钮加大、加粗文字 */
+      .btn-delete {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.82rem;
+        min-height: 42px;
+      }
+    }
+
+    /* 超小屏：删除按钮换行到下面，占满右侧 */
+    @media (max-width: 420px) {
+      .shoe-item {
+        flex-wrap: wrap;
+      }
+      .btn-delete {
+        margin-left: auto;
+        margin-top: 0.2rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .brand h1 { font-size: 1rem; }
+      .image-preview { width: 90px; height: 90px; }
+    }
+
+    /* 平板/电脑 */
+    @media (min-width: 641px) {
+      body { padding: 1.5rem; }
+      .app-container { padding: 1.8rem; }
+      .brand h1 { font-size: 1.6rem; }
+      .brand .badge { display: inline-block; }
+      .top-bar { flex-wrap: nowrap; }
+      .search-section { flex: 0 1 auto; width: auto; max-width: 320px; }
+      .search-section input { width: 160px; }
+      .form-grid { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+      .image-upload-group { grid-column: 1 / -1; }
+      .image-upload-wrapper { flex-wrap: nowrap; align-items: center; }
+      .btn-add { flex: 0 0 auto; margin-top: 0; margin-left: auto; }
+      .shoe-item { padding: 1rem 1.3rem; }
+      .shoe-thumb { width: 70px; height: 70px; }
+      .shoe-content { flex-direction: row; align-items: center; gap: 1.5rem; }
+      .price-group { margin-left: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 顶部：标题 + 搜索 -->
+    <div class="top-bar">
+      <div class="brand">
+        <h1>👟 鞋款工作台 <span class="badge">新款上传 · 编号检索</span></h1>
+      </div>
+      <div class="search-section">
+        <input type="text" id="searchInput" placeholder="输入编号搜索..." autocomplete="off" inputmode="search">
+        <button id="searchBtn" title="搜索">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          搜索
+        </button>
+      </div>
+    </div>
+
+    <!-- 上传表单 -->
+    <div class="upload-card">
+      <h2><span>+</span> 上传新款鞋子</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>鞋子编号</label>
+          <input type="text" id="shoeCode" placeholder="NK-023" autocomplete="off" inputmode="text">
+        </div>
+        <div class="form-group">
+          <label>客户型号</label>
+          <input type="text" id="shoeModel" placeholder="例如: A-01 / 客户款" autocomplete="off" inputmode="text">
+        </div>
+        <div class="form-group">
+          <label>颜色</label>
+          <input type="text" id="shoeColor" placeholder="黑白" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>价格 (元)</label>
+          <input type="number" id="shoePrice" placeholder="399" step="0.01" min="0" inputmode="decimal">
+        </div>
+
+        <!-- 图片上传区 -->
+        <div class="form-group image-upload-group">
+          <div class="image-upload-wrapper">
+            <div class="image-preview" id="imagePreview" title="点击可放大查看">
+              <span class="placeholder-icon">🖼️</span>
+            </div>
+            <div class="image-actions">
+              <label class="file-input-label" id="fileLabel">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span id="fileLabelText">选择图片</span>
+                <input type="file" id="shoeImage" accept="image/*">
+              </label>
+              <button class="btn-reselect" id="reselectBtn" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                重新选择
+              </button>
+              <div class="image-filename" id="imageFilename">
+                <span>📎</span>
+                <span id="filenameText"></span>
+              </div>
+            </div>
+            <button class="btn-add" id="addBtn">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              添加新款
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="message" class="message-bar" style="display: none;"></div>
+    </div>
+
+    <!-- 列表 -->
+    <div class="list-header">
+      <h3>📋 当前鞋款</h3>
+      <span class="count-badge" id="countDisplay">0 款</span>
+    </div>
+    <div id="shoesList" class="shoes-grid"></div>
+    <div id="emptyMessage" class="empty-state" style="display: none;">
+      🕊️ 还没有鞋款信息，上传第一款吧
+    </div>
+  </div>
+
+  <!-- 图片放大弹层 -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <img id="lightboxImg" src="" alt="查看大图">
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <div class="warn-icon">🗑️</div>
+      <h4>确认删除？</h4>
+      <p>即将删除鞋款 <strong id="confirmShoeCode">—</strong><br>删除后无法恢复</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel" id="confirmCancel">取消</button>
+        <button class="btn-confirm-delete" id="confirmDelete">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      let shoes = [];
+      const STORAGE_KEY = 'shoe_shop_items_v8';
+
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          shoes = JSON.parse(saved);
+          if (!Array.isArray(shoes)) shoes = [];
+        }
+      } catch (e) { shoes = []; }
+
+      if (shoes.length === 0) {
+        const demoImg = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect width="80" height="80" fill="%23e2e8f0"/%3E%3Ctext x="40" y="48" font-size="30" text-anchor="middle" fill="%2394a3b8"%3E👟%3C/text%3E%3C/svg%3E';
+        shoes = [
+          { id: '1', code: 'NK-101', model: 'A-01', color: '黑白', price: 499, image: demoImg },
+          { id: '2', code: 'AD-202', model: 'B-12', color: '米白', price: 629, image: demoImg }
+        ];
+      }
+
+      // DOM
+      const shoesListEl = document.getElementById('shoesList');
+      const emptyMessageEl = document.getElementById('emptyMessage');
+      const countDisplay = document.getElementById('countDisplay');
+      const searchInput = document.getElementById('searchInput');
+      const searchBtn = document.getElementById('searchBtn');
+      const shoeCodeInput = document.getElementById('shoeCode');
+      const shoeModelInput = document.getElementById('shoeModel');
+      const shoeColorInput = document.getElementById('shoeColor');
+      const shoePriceInput = document.getElementById('shoePrice');
+      const shoeImageInput = document.getElementById('shoeImage');
+      const imagePreview = document.getElementById('imagePreview');
+      const addBtn = document.getElementById('addBtn');
+      const messageEl = document.getElementById('message');
+      const reselectBtn = document.getElementById('reselectBtn');
+      const imageFilename = document.getElementById('imageFilename');
+      const filenameText = document.getElementById('filenameText');
+      const fileLabelText = document.getElementById('fileLabelText');
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightboxImg');
+      const lightboxClose = document.getElementById('lightboxClose');
+      const confirmOverlay = document.getElementById('confirmOverlay');
+      const confirmShoeCode = document.getElementById('confirmShoeCode');
+      const confirmCancel = document.getElementById('confirmCancel');
+      const confirmDelete = document.getElementById('confirmDelete');
+
+      let currentImageData = null;
+      let pendingDeleteId = null;  // 待删除的鞋款 id
+
+      function saveToStorage() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(shoes)); }
+        catch (e) { showMessage('存储空间已满，请删除部分图片', true); }
+      }
+
+      function showMessage(text, isError = false) {
+        messageEl.textContent = text;
+        messageEl.style.display = 'inline-block';
+        messageEl.style.background = isError ? '#fee9e7' : '#edf7f2';
+        messageEl.style.color = isError ? '#b53b2c' : '#1e4d38';
+        clearTimeout(window._msgTimer);
+        window._msgTimer = setTimeout(() => { messageEl.style.display = 'none'; }, 3000);
+      }
+
+      function getColorPreview(text) {
+        if (!text) return '#ccc';
+        const t = text.toLowerCase();
+        if (t.includes('黑') && t.includes('白')) return 'linear-gradient(135deg,#222 50%,#fff 50%)';
+        if (t.includes('黑')) return '#222';
+        if (t.includes('白') || t.includes('米白')) return '#f0f0f0';
+        if (t.includes('红')) return '#c0392b';
+        if (t.includes('蓝')) return '#2c6e9c';
+        if (t.includes('绿')) return '#2d6a4f';
+        if (t.includes('灰')) return '#7f8c8d';
+        if (t.includes('粉')) return '#e8a4b8';
+        if (t.includes('黄')) return '#e6b800';
+        if (t.includes('棕') || t.includes('咖')) return '#8b5a2b';
+        return '#b0bec5';
+      }
+
+      function genId() { return Date.now() + '-' + Math.random().toString(36).slice(2, 8); }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, m => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[m]));
+      }
+
+      function updatePreview(dataUrl, fileName) {
+        if (dataUrl) {
+          imagePreview.innerHTML = `<img src="${dataUrl}" alt="预览">`;
+          imagePreview.classList.add('has-image');
+          reselectBtn.classList.add('visible');
+          fileLabelText.textContent = '换一张';
+          if (fileName) {
+            filenameText.textContent = fileName;
+            imageFilename.classList.add('visible');
+          } else {
+            imageFilename.classList.remove('visible');
+          }
+        } else {
+          imagePreview.innerHTML = `<span class="placeholder-icon">🖼️</span>`;
+          imagePreview.classList.remove('has-image');
+          reselectBtn.classList.remove('visible');
+          fileLabelText.textContent = '选择图片';
+          imageFilename.classList.remove('visible');
+          filenameText.textContent = '';
+        }
+      }
+
+      function openLightbox(src) {
+        if (!src) return;
+        lightboxImg.src = src;
+        lightbox.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeLightbox() {
+        lightbox.classList.remove('visible');
+        lightboxImg.src = '';
+        document.body.style.overflow = '';
+      }
+
+      // ========== 删除确认弹窗 ==========
+      function openDeleteConfirm(shoe) {
+        pendingDeleteId = shoe.id;
+        confirmShoeCode.textContent = shoe.code;
+        confirmOverlay.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeDeleteConfirm() {
+        pendingDeleteId = null;
+        confirmOverlay.classList.remove('visible');
+        document.body.style.overflow = '';
+      }
+      function doDelete() {
+        if (!pendingDeleteId) return;
+        const shoe = shoes.find(s => s.id === pendingDeleteId);
+        if (!shoe) { closeDeleteConfirm(); return; }
+
+        shoes = shoes.filter(s => s.id !== pendingDeleteId);
+        saveToStorage();
+        closeDeleteConfirm();
+        renderList(searchInput.value);
+        showMessage(`✅ 已删除 ${shoe.code}`);
+      }
+
+      function renderList(filter = '') {
+        const f = filter.trim().toLowerCase();
+        const list = f ? shoes.filter(s => s.code.toLowerCase().includes(f)) : shoes;
+
+        countDisplay.textContent = f ? `${list.length} / ${shoes.length} 款` : `${shoes.length} 款`;
+
+        if (shoes.length === 0) {
+          shoesListEl.innerHTML = '';
+          emptyMessageEl.style.display = 'block';
+          emptyMessageEl.textContent = '🕊️ 还没有鞋款信息，上传第一款吧';
+          return;
+        }
+        if (list.length === 0) {
+          shoesListEl.innerHTML = '';
+          emptyMessageEl.style.display = 'block';
+          emptyMessageEl.textContent = `🔍 没有找到编号包含 "${filter}" 的鞋子`;
+          return;
+        }
+        emptyMessageEl.style.display = 'none';
+        shoesListEl.innerHTML = '';
+
+        list.forEach(shoe => {
+          let codeHtml = escapeHtml(shoe.code);
+          if (f && shoe.code.toLowerCase().includes(f)) {
+            const re = new RegExp(`(${f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            codeHtml = escapeHtml(shoe.code).replace(re, '<span class="highlight">$1</span>');
+          }
+          const colorStyle = getColorPreview(shoe.color);
+          const thumb = shoe.image 
+            ? `<img src="${shoe.image}" alt="${escapeHtml(shoe.code)}">` 
+            : `<span class="no-image">👟</span>`;
+
+          const modelHtml = shoe.model 
+            ? `<span class="shoe-model"><span class="model-icon">🏷️</span>${escapeHtml(shoe.model)}</span>` 
+            : '';
+
+          const div = document.createElement('div');
+          div.className = 'shoe-item';
+          div.innerHTML = `
+            <div class="shoe-thumb" data-shoe-id="${shoe.id}">${thumb}</div>
+            <div class="shoe-content">
+              <div class="shoe-top-row">
+                <div class="shoe-code">${codeHtml}</div>
+                <div class="shoe-color">
+                  <span class="color-dot" style="background:${colorStyle}"></span>
+                  <span>${escapeHtml(shoe.color) || '未填'}</span>
+                </div>
+              </div>
+              <div class="shoe-top-row">
+                ${modelHtml}
+                <div class="price-group">
+                  <div class="price-row">
+                    <span class="price-label">价格</span>
+                    <span class="price-value">¥${Number(shoe.price).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="btn-delete" data-id="${shoe.id}" title="删除此鞋款">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+              删除
+            </button>
+          `;
+          shoesListEl.appendChild(div);
+        });
+
+        // 删除按钮点击
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-id');
+            const shoe = shoes.find(s => s.id === id);
+            if (shoe) openDeleteConfirm(shoe);
+          };
+        });
+
+        // 点击缩略图放大
+        document.querySelectorAll('.shoe-thumb').forEach(thumb => {
+          thumb.onclick = () => {
+            const id = thumb.getAttribute('data-shoe-id');
+            const shoe = shoes.find(s => s.id === id);
+            if (shoe && shoe.image) openLightbox(shoe.image);
+          };
+        });
+      }
+
+      function handleImage(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          showMessage('图片不能超过 5MB', true);
+          shoeImageInput.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = ev => {
+          currentImageData = ev.target.result;
+          updatePreview(currentImageData, file.name);
+          showMessage(`已选择：${file.name}`);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function addShoe() {
+        const code = shoeCodeInput.value.trim();
+        const model = shoeModelInput.value.trim();
+        const color = shoeColorInput.value.trim();
+        const priceRaw = shoePriceInput.value.trim();
+
+        if (!code) { showMessage('请输入编号', true); shoeCodeInput.focus(); return; }
+        if (!color) { showMessage('请输入颜色', true); shoeColorInput.focus(); return; }
+        if (!priceRaw) { showMessage('请输入价格', true); shoePriceInput.focus(); return; }
+
+        const price = parseFloat(priceRaw);
+        if (isNaN(price) || price < 0) { showMessage('价格不正确', true); shoePriceInput.focus(); return; }
+
+        if (shoes.some(s => s.code.toLowerCase() === code.toLowerCase())) {
+          showMessage(`编号 "${code}" 已存在`, true);
+          shoeCodeInput.focus();
+          return;
+        }
+
+        shoes.push({
+          id: genId(),
+          code, model, color, price,
+          image: currentImageData || null
+        });
+        saveToStorage();
+
+        shoeCodeInput.value = '';
+        shoeModelInput.value = '';
+        shoeColorInput.value = '';
+        shoePriceInput.value = '';
+        shoeImageInput.value = '';
+        currentImageData = null;
+        updatePreview(null);
+
+        if (searchInput.value.trim()) searchInput.value = '';
+        renderList('');
+        showMessage(`✅ 已添加 ${code}`);
+        shoeCodeInput.focus();
+      }
+
+      function doSearch() {
+        renderList(searchInput.value);
+      }
+
+      // ========== 事件绑定 ==========
+      addBtn.addEventListener('click', addShoe);
+      searchBtn.addEventListener('click', doSearch);
+      shoeImageInput.addEventListener('change', handleImage);
+
+      reselectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        shoeImageInput.click();
+      });
+
+      imagePreview.addEventListener('click', () => {
+        if (currentImageData) openLightbox(currentImageData);
+      });
+
+      lightboxClose.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeLightbox();
+          closeDeleteConfirm();
+        }
+      });
+
+      // 删除确认弹窗事件
+      confirmCancel.addEventListener('click', closeDeleteConfirm);
+      confirmDelete.addEventListener('click', doDelete);
+      confirmOverlay.addEventListener('click', (e) => {
+        if (e.target === confirmOverlay) closeDeleteConfirm();
+      });
+
+      searchInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+      });
+
+      [shoeCodeInput, shoeModelInput, shoeColorInput, shoePriceInput].forEach(inp => {
+        inp.addEventListener('keypress', e => {
+          if (e.key === 'Enter') { e.preventDefault(); addShoe(); }
+        });
+      });
+
+      renderList('');
+      updatePreview(null);
+    })();
+  </script>
+</body>
+</html>
